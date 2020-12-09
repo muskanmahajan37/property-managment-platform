@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: ${BACKEND_CONTAINER}
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+        - ./:/app
+    env_file:
+      - .env
+    command: /start-reload.sh
+    environment:
+      APP_MODULE: src.flex.main:app
+      PRE_START_PATH: prestart.sh
+      PORT: 8000
+  db:
+    image: postgres:9.6
+    container_name: ${DATABASE_CONTAINER}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_SERVER: ${POSTGRES_SERVER}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ${PGADMIN_CONTAINER}
+    depends_on:
+      - db
+    ports:
+    - "5050:5050"
+    volumes:
+    - pga4volume:/var/lib/pgadmin
+    environment:
+      PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+volumes:
+  postgres_data:
+  pga4volume:
